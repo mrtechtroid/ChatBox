@@ -425,6 +425,6 @@ minetest.register_chatcommand("rules",{
     func = function(name,params)
         rulesfunc()
         minetest.show_formspec(name, "chatbox:rules", rulesfunc())
-    end
+    end,
     privs = {},
 })
