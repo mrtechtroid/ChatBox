@@ -1,5 +1,5 @@
 # ChatBox
-A Light Weight Multicraft Mod For Servers Adding Various Chat Commands
+A Light Weight Minetest Mod For Servers Adding Various Chat Commands
 ![screenshot](https://github.com/mrtechtroid/ChatBox/blob/main/screenshot.png?raw=true)
 ## List Of New Privilages
 1. `announce` - Allows You To Send Messages Prefixed With `[Server]` Prefix. 
