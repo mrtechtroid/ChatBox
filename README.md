@@ -24,8 +24,18 @@ A Light Weight Minetest Mod For Servers Adding Various Chat Commands
 14. `\search` - Search For A Block Near Your Area - `\search <blockid>` - Requires: `server`
 15. `\h` - Fills The Health Of The Player - `\h` - Requires: `effects`
 16. `\immortal` - Makes A Player Immortal To All Kinds Of Damages - `\immortal` - Requires: `effects`
-17. `\rules` - View The Rules Of The Server In A GUI Interface - `\rules` - Requires: No Privilage Needed
-18. `\cbox` - View Additional Details About The Mod - `\cbox` - Requires: No Privilage Needed
+17. `\hp` - Sets A Custom HP Of The Player- `\hp <hp>` - Requires: `effects`
+18. `\bnight` - Makes Nights Look As Day For A Single Player - `\bnight` - Requires: `effects`
+19. `\ncol` - Sets A Custom Player Name Tag Color For A Player Using RGB.(Removed On LogOff) - `\ncol <r> <g> <b>` - Requires: `effects`
+20. `\warn` - Makes A Player Immortal To All Kinds Of Damages - `\warn <message>` - Requires: `announce`
+21. `\rules` - View The Rules Of The Server In A GUI Interface - `\rules` - Requires: No Privilage Needed
+22. `\cbox` - View Additional Details About The Mod - `\cbox` - Requires: No Privilage Needed
+
+## Additional Features
+1. A Custom Colored Chat With The Ability To Use "!" Infront Of Messages To Make Them Green.
+2. Roles Appear On The Main Public Chat With A Red Color. 
+3. Death Messages Informing The Last Death Location To The Player. 
+
 
 ### Rules
 To Modify The Rules Of The Server Change the `rules.txt` File In The Directory
