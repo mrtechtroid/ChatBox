@@ -1,9 +1,9 @@
 -- ChatBox By Mr Techtroid
 -- Released Under MIT License
--- Version 1.0.0 (2022)
+-- Version 1.0.1 (2022)
 -- Copyright (C) 2022 Mr Techtroid
 chatbox = {
-    vno = "1.0.0",
+    vno = "1.0.1",
     author = "Mr Techtroid",
     license = "MIT License",
     copyright = "Copyright (C) 2022 Mr Techtroid",
@@ -28,7 +28,6 @@ local function dischat()
     end
 end
 local function rulesfunc()
-    local text = "I'm thinking of a number... Make a guess!"
     local formspec = {
         "formspec_version[4]",
         "size[12,12]",
@@ -64,6 +63,10 @@ local function rgb_to_hex(r, g, b)
 		math.floor(r*255),
 		math.floor(g*255),
 		math.floor(b*255))
+end
+function rgbToHex(r,g,b)
+    local rgb = (r * 0x10000) + (g * 0x100) + b
+    return "#" .. string.format("%x", rgb)
 end
 
 local function sndMsg(sender,reciever,message)
@@ -271,7 +274,9 @@ minetest.register_on_leaveplayer(function(ObjectRef, timed_out)
     pname = ObjectRef:get_player_name()
     replyto[pname] = nil
     invisiblity[pname] = nil
-    imortality[name] = nil
+    imortality[pname] = nil
+    player = minetest.get_player_by_name(pname)
+    player:override_day_night_ratio(nil)
     -- minetest.chat_send_all(dump(replyto))
 end
 )
@@ -385,6 +390,17 @@ minetest.register_chatcommand("h",{
     end,
     privs = {effects = true},
 })
+
+-- Custom Health - /hp - Allows You To Set A Custom HP Of Player
+minetest.register_chatcommand("hp",{
+    params = "<hp>",
+    description = "Set A Custom HP Of Player",
+    func = function(name,param)
+        local player = minetest.get_player_by_name(name)
+        player:set_hp(param)
+    end,
+    privs = {effects = true},
+})
 -- Immortal - /immortal - Makes You Resistant To All Damages
 minetest.register_chatcommand("immortal",{
     params = "",
@@ -401,6 +417,7 @@ minetest.register_chatcommand("immortal",{
                 imortality[name] = true
                 armour.fall_damage_add_percent = -100
                 player:set_armor_groups(armour)
+                minetest.chat_send_player(name,minetest.colorize("#FF0000","You Are Now Immortal"))
             end
         end
     end,
@@ -419,6 +436,8 @@ minetest.register_chatcommand("cbox",{
     end,
     privs = {},
 })
+
+-- Rules /rules - Gives A List Of All Rules In A GUI
 minetest.register_chatcommand("rules",{
     params = "",
     description = "Display The Server Rules",
@@ -428,3 +447,88 @@ minetest.register_chatcommand("rules",{
     end,
     privs = {},
 })
+
+-- Bright Night /bnight - Increases The Day Night Ratio For That Player
+minetest.register_chatcommand("bnight",{
+    params = "",
+    privs = {effects = true},
+    func = function(name)
+        local player = minetest.get_player_by_name(name)
+        if player:get_day_night_ratio() == 1 then
+            player:override_day_night_ratio(nil)
+        else
+            player:override_day_night_ratio(1)
+        end
+    end,
+    description = "Increases The Day Night Ratio For That Player"
+})
+
+-- NameTag Color /ncol - Allows Players To Change Their Nametag Colors
+minetest.register_chatcommand("ncol",{
+    params = "<r> <g> <b>",
+    privs = {effects = true},
+    func = function(name,params)
+        local player = minetest.get_player_by_name(name)
+        local nametag = player:get_nametag_attributes()
+        opts, args = getopts("ncol",params)
+        nametag.color.a = 255
+        nametag.color.r = args[1]
+        nametag.color.g = args[2]
+        nametag.color.b = args[3]
+        player:set_nametag_attributes(nametag)
+    end,
+    description = "Changes The Name Tag Color"
+})
+
+-- Colored Multiplayer Chat 
+
+minetest.register_on_chat_message(function(name, message)
+    local  modtext = ""
+    local  msgcolor = "#FFFFFF"
+    local player = minetest.get_player_by_name(name)
+    local nametag = player:get_nametag_attributes()
+    local nt = nametag.color
+    if not minetest.check_player_privs(name, {shout = true}) then
+        minetest.chat_send_player(name,minetest.colorise("#FF0000","You Dont Have Privilege To Send Messages"))
+    end
+    if minetest.check_player_privs(name, {youtuber = true}) then
+        modtext = minetest.colorize("#FF0000","[YT]")
+    end
+    if minetest.check_player_privs(name, {moderator = true}) then
+        modtext = minetest.colorize("#FF0000","[S]")
+    end
+    if minetest.check_player_privs(name, {server = true}) then
+        modtext = minetest.colorize("#FF0000","[Admin]")
+    end
+    if minetest.check_player_privs(name, {moderator = true}) or minetest.check_player_privs(name, {server = true}) then
+        if string.sub(message,1,1) == "!" then
+            msgcolor = "#006400"
+            message = message:sub(2,message:len())
+        end
+    end
+    minetest.chat_send_all(modtext .. " " .. minetest.colorize(rgbToHex(nt.r, nt.g, nt.b),name)..": "..minetest.colorize(msgcolor,message)) 
+    return true
+end
+)
+
+-- Death Coordinates
+minetest.register_on_dieplayer(function(ObjectRef, reason)
+    local name = ObjectRef:get_player_name()
+    local position = ObjectRef:getpos()
+    minetest.chat_send_player(name,minetest.colorize("#FF0000","You Died At "..math.floor(position.x) .. ", " .. math.floor(position.y) .. ", " .. math.floor(position.z) .. " Coordinates"))
+    return true
+end
+)
+
+-- Warn /warn Allows Admins To Warn Players
+minetest.register_chatcommand("warn",{
+    params = "<message>",
+    description = "Allows Admins To Warn Players Over Chat",
+    func = function(name,param)
+        -- if not param == "" then
+            minetest.chat_send_all(minetest.colorize("#FF0000","[WARNING]") .. minetest.colorize("#FF0000",": "..param))
+        -- end
+    end,
+    privs = {announce = true,},
+})
+
